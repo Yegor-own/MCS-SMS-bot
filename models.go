@@ -47,3 +47,16 @@ type AlertTimer struct {
 	ChatID int64
 	Region string
 }
+
+type FunFacts struct {
+	Facts []string `json:"facts"`
+}
+
+func ParseFunFacts(data []byte) FunFacts {
+	var ff FunFacts
+	err := json.Unmarshal(data, &ff)
+	if err != nil {
+		fmt.Println("FunFacts > ", err)
+	}
+	return ff
+}

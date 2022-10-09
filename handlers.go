@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"github.com/bradfitz/gomemcache/memcache"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"io/ioutil"
+	"log"
+	"math/rand"
 	"strconv"
 )
 
@@ -102,11 +105,15 @@ func receivedMessageHandler(chatId string, userStatus string, receivedMessage st
 		if err != nil {
 			msg.Text = err.Error()
 		} else {
-			msg.Text = "Вы будете получать ежедневные оповещения о погодных условиях для " + text + "\nЧтобы получить оповещение сейчас нажмите /getAlert\nЧтобы сбросить выбраный регион используйте /resetRegion"
+			msg.Text = "Вы будете получать ежедневные оповещения о погодных условиях для " + text +
+				"\nЧтобы получить оповещение сейчас нажмите /getAlert" +
+				"\nЧтобы сбросить выбраный регион используйте /resetRegion" +
+				"\nЧтобы узнать случайный факт о погоде используйте /funfact"
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 				tgbotapi.NewKeyboardButtonRow(
 					tgbotapi.NewKeyboardButton("/getAlert"),
 					tgbotapi.NewKeyboardButton("/resetRegion"),
+					tgbotapi.NewKeyboardButton("/funfact"),
 				),
 			)
 		}
@@ -146,6 +153,28 @@ func receivedMessageHandler(chatId string, userStatus string, receivedMessage st
 				events += "\n" + event
 			}
 			msg.Text = content.Region[1] + ":\n" + events
+		}
+		if receivedMessage == "/funfact" {
+			id := rand.Intn(5)
+			tmp, err := ioutil.ReadFile("funfacts.json")
+			if err != nil {
+				fmt.Println("handler > ", err)
+				msg.Text = "Упс кажется что-то пошло не так"
+				if _, err = Bot.Send(msg); err != nil {
+					fmt.Println("handler > ", err)
+				}
+				return
+			}
+			text := ParseFunFacts(tmp)
+			msg.Text = text.Facts[id]
+			if _, err = Bot.Send(msg); err != nil {
+				fmt.Println("handler > ", err)
+			}
+			photo := tgbotapi.NewPhoto(chatId64, tgbotapi.FilePath("images/"+strconv.Itoa(id)+".jpg"))
+			if _, err = Bot.Send(photo); err != nil {
+				log.Fatalln(err)
+			}
+			return
 		}
 	}
 
