@@ -108,7 +108,7 @@ func receivedMessageHandler(chatId string, userStatus string, receivedMessage st
 			msg.Text = "Вы будете получать ежедневные оповещения о погодных условиях для " + text +
 				"\nЧтобы получить оповещение сейчас нажмите /getAlert" +
 				"\nЧтобы сбросить выбраный регион используйте /resetRegion" +
-				"\nЧтобы узнать случайный факт о погоде используйте /funfact"
+				"\nЧтобы узнать интересный факт о погоде используйте /funfact"
 			msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 				tgbotapi.NewKeyboardButtonRow(
 					tgbotapi.NewKeyboardButton("/getAlert"),
@@ -148,7 +148,7 @@ func receivedMessageHandler(chatId string, userStatus string, receivedMessage st
 
 			content := getAlertRegionsData(data.RegionId)
 
-			var events = "Оповещения:"
+			var events = "Оповещения"
 			for _, event := range content.Events {
 				events += "\n" + event
 			}

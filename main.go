@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bradfitz/gomemcache/memcache"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/bradfitz/gomemcache/memcache"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -50,7 +51,10 @@ func init() {
 		fmt.Println(err)
 	}
 
-	mc = memcache.New("127.0.0.1:11211", "localhost:11211")
+	mc = memcache.New("localhost:11211") // "127.0.0.1:11211", "localhost:11211"
+	if err = mc.Ping(); err != nil {
+		panic(err)
+	}
 	err = mc.DeleteAll()
 	if err != nil {
 		fmt.Println(err)
@@ -76,7 +80,7 @@ func main() {
 				fmt.Println("main > ", it.Key, string(it.Value))
 				receivedMessageHandler(it.Key, p.Status, update.Message.Text)
 			} else {
-				fmt.Println("main > ", err)
+				fmt.Println("main > err >", err)
 			}
 
 		}
